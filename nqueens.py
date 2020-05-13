@@ -3,6 +3,7 @@ __author__ = 'Nenad'
 from numpy.random import randint, random_sample
 import numpy
 from operator import add
+from functools import reduce
 
 def clamp(minimum, x, maximum):
     return max(minimum, min(x, maximum))
@@ -18,35 +19,35 @@ def is_valid(q1, q2, debug=False):
     if q1['row'] == q2['row']:
         err += 1
         if debug:
-            print "Rows -> ({0}, {1}) ({2}, {3})".format(q1['row'], q1['column'], q2['row'], q2['column'])
+            print("Rows -> ({0}, {1}) ({2}, {3})".format(q1['row'], q1['column'], q2['row'], q2['column']))
     if q1['column'] == q2['column']:
         err += 1
         if debug:
-            print "Columns -> ({0}, {1}) ({2}, {3})".format(q1['row'], q1['column'], q2['row'], q2['column'])
+            print("Columns -> ({0}, {1}) ({2}, {3})".format(q1['row'], q1['column'], q2['row'], q2['column']))
     if abs(q2['column'] - q1['column']) == abs(q2['row'] - q1['row']):
         err += 1
         if debug:
-            print "Diagonal -> ({0}, {1}) ({2}, {3})".format(q1['row'], q1['column'], q2['row'], q2['column'])
+            print("Diagonal -> ({0}, {1}) ({2}, {3})".format(q1['row'], q1['column'], q2['row'], q2['column']))
     return err
 
 def draw_table(queen_array):
     n = queen_array.size
 
-    for i in xrange(0, n):
+    for i in range(0, n):
         line = ""
-        for j in xrange(0, n):
+        for j in range(0, n):
             q_pos = queen_array[i]
             if j == q_pos:
                 line += 'X  '
             else:
                 line += '_  '
-        print line
+        print(line)
 
 
 
 def fitness(queen_array, debug=False):
     if debug:
-        print queen_array
+        print(queen_array)
     fit = 0
     n = queen_array.size
     for i in range(0, n):
@@ -95,8 +96,9 @@ def mutate(queen_array, strength, count=1):
 
 def average_fitness(pop):
     fitnesses = [fitness(ind) for ind in pop]
-    summation = reduce(add, fitnesses, 0)
-    return summation * 1.0 / len(pop)
+    return min(fitnesses)
+    #summation = reduce(add, fitnesses, 0)
+    #return summation * 1.0 / len(pop)
 
 def sort_arrays(pop):
     fit_population = [(fitness(p), p) for p in pop]
@@ -145,10 +147,10 @@ def evolve(pop, random_select=0.05, elite_percent=0.2, mutation=0.03):
 
 pops = population(100, 8)
 
-for x in xrange(5000):
+for x in range(5000):
     pops = evolve(pops, random_select=0.02, elite_percent=0.2, mutation=0.05)
     avg = average_fitness(pops)
-    print avg
+    print("Gen: {0}, Fitness: {1}\r".format(x, avg), end="")
     if avg == 0:
         draw_table(pops[0])
         break
