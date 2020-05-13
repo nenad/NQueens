@@ -41,7 +41,8 @@ func TestDNA_Fitness(t *testing.T) {
 			dna := &DNA{
 				Positions: tt.positions,
 			}
-			if got := dna.Fitness(); got != tt.want {
+			dna.CalculateFitness()
+			if got := dna.Fitness; got != tt.want {
 				t.Errorf("Fitness() = %v, want %v", got, tt.want)
 			}
 		})
