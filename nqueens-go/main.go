@@ -63,25 +63,25 @@ func run(cfg Configuration) error {
 			totalFitness += population[i].Fitness
 		}
 
-		// Add 100 kids to the population
-		for i := 0; i < 100; i++ {
+		newGen := make([]DNA, cfg.Population)
+		for i := 0; i < cfg.Population; i++ {
 			r1 := rand.Float64() * totalFitness
 			r2 := rand.Float64() * totalFitness
 
-			p1, p2 := population[rand.Intn(n)], population[rand.Intn(n)]
+			var p1, p2 *DNA
 
 			gotParents := 0
 			// best parent selection
 			for j := 0; j < n; j++ {
 				r1 -= population[j].Fitness
-				if r1 <= 0 {
-					p1 = population[j]
+				if r1 <= 0 && p1 == nil {
+					p1 = &population[j]
 					gotParents++
 				}
 
 				r2 -= population[j].Fitness
-				if r2 <= 0 {
-					p2 = population[j]
+				if r2 <= 0  && p2 == nil{
+					p2 = &population[j]
 					gotParents++
 				}
 
@@ -90,14 +90,13 @@ func run(cfg Configuration) error {
 				}
 			}
 
-			child := p1.Crossover(p2)
+			child := p1.Crossover(*p2)
 			child.Mutate(cfg.MutationChance)
 			child.CalculateFitness()
-			population = append(population, child)
+			newGen[i] = child
 		}
 
-		// Drop the 100 oldest members of the population
-		population = population[100:]
+		population = newGen
 
 		fmt.Printf("Gen: %d, Max fitness now: %.2f\r", gen, maxDNA.Fitness)
 	}
